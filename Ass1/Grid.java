@@ -51,7 +51,7 @@ public class Grid {
         gridPanel.add(canvas);
         gridPanel.add(buttonPanel);
 
-        mainFrame = new JFrame("Assignment 1");
+        mainFrame = new JFrame("Assignment 1 - Arnab Sen (510519006)");
         mainFrame.add(gridPanel);
         mainFrame.setSize(1000, 800);
         mainFrame.addWindowListener(new WindowAdapter() {
@@ -115,13 +115,13 @@ public class Grid {
 
             for (int i = originX; i <= width; i += gap, yCord--) {
                 g.drawLine(i, 0, i, height);
-                g.drawString(String.valueOf(yCord), originX - 20, i + 30);
+                g.drawString(String.valueOf(yCord), originX - 20, i);
 
             }
             yCord = 0;
             for (int i = originX; i >= 0; i -= gap, yCord++) {
                 g.drawLine(i, 0, i, height);
-                g.drawString(String.valueOf(yCord), originX - 20, i + 30);
+                g.drawString(String.valueOf(yCord), originX - 20, i);
 
             }
         }
