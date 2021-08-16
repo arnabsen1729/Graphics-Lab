@@ -80,6 +80,7 @@ public class ListenerTest {
   }
 
   class CustomMouseListener implements MouseListener {
+
     public void mouseClicked(MouseEvent e) {
       System.out.println("Mouse Clicked: (" + e.getX() + ", " + e.getY() + ")");
     }
