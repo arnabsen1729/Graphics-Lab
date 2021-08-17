@@ -13,21 +13,19 @@ public class Grid3 {
   private Color gridColor;
   private int gap;
 
-  private ArrayList<Rectangle> rectangles = new ArrayList<Rectangle>();
+  private ArrayList<Point> points = new ArrayList<Point>();
 
-  public class Rectangle {
-    public int x, y, width, height;
+  public class Point {
+    public int x, y;
 
-    Rectangle(int x, int y, int width, int height) {
+    Point(int x, int y) {
       this.x = x;
       this.y = y;
-      this.width = width;
-      this.height = height;
     }
   }
 
   public Grid3() {
-    gap = 20;
+    gap = 40;
     prepareGUI();
   }
 
@@ -61,36 +59,28 @@ public class Grid3 {
     });
 
     // button to draw rectangle
-    JButton rectButton = new JButton("Rectangle");
-    rectButton.addActionListener(new ActionListener() {
+    JButton pointButton = new JButton("Add Point");
+    pointButton.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
         // show a dialog to enter rectangle coordinates
         JPanel coordPanel = new JPanel(new GridLayout(0, 1));
         JTextField x = new JTextField(2);
         JTextField y = new JTextField(2);
-        JTextField w = new JTextField(2);
-        JTextField h = new JTextField(2);
 
         coordPanel.add(new JLabel("X coordinate: "));
         coordPanel.add(x);
         coordPanel.add(new JLabel("Y coordinate: "));
         coordPanel.add(y);
-        coordPanel.add(new JLabel("Width: "));
-        coordPanel.add(w);
-        coordPanel.add(new JLabel("Height: "));
-        coordPanel.add(h);
 
-        int result = JOptionPane.showConfirmDialog(mainFrame, coordPanel, "Enter coordinates",
+        int result = JOptionPane.showConfirmDialog(mainFrame, coordPanel, "Enter coordinates for point",
             JOptionPane.OK_CANCEL_OPTION);
 
         if (result == JOptionPane.OK_OPTION && x.getText().length() > 0 && y.getText().length() > 0) {
           int xCoord = Integer.parseInt(x.getText());
           int yCoord = Integer.parseInt(y.getText());
-          int width = Integer.parseInt(w.getText());
-          int height = Integer.parseInt(h.getText());
-          Rectangle rect = new Rectangle(xCoord, yCoord, width, height);
-          rectangles.add(rect);
 
+          Point pt = new Point(xCoord, yCoord);
+          points.add(pt);
           canvas.repaint();
         }
       }
@@ -98,14 +88,15 @@ public class Grid3 {
 
     buttonPanel.add(bgButton);
     buttonPanel.add(fgButton);
-    buttonPanel.add(rectButton);
+    buttonPanel.add(pointButton);
 
     gridPanel.add(canvas);
     gridPanel.add(buttonPanel);
 
     mainFrame = new JFrame("Assignment 1 - Arnab Sen (510519006)");
     mainFrame.add(gridPanel);
-    mainFrame.setSize(1000, 800);
+    mainFrame.setSize(1300, 900);
+    mainFrame.addComponentListener(new ResizeListener());
     mainFrame.addWindowListener(new WindowAdapter() {
       public void windowClosing(WindowEvent windowEvent) {
         System.exit(0);
@@ -119,12 +110,33 @@ public class Grid3 {
       int notches = e.getWheelRotation();
       if (notches < 0) {
         gap = gap + 10;
-        gap = gap > 100 ? 100 : gap;
+        gap = gap > 150 ? 150 : gap;
       } else {
         gap = gap - 10;
-        gap = gap < 30 ? 30 : gap;
+        gap = gap < 20 ? 20 : gap;
       }
       canvas.repaint();
+    }
+  }
+
+  // class to detect frame resize
+  class ResizeListener implements ComponentListener {
+    public void componentResized(ComponentEvent e) {
+      int height = mainFrame.getHeight();
+      int width = mainFrame.getWidth();
+      canvas.setSize(width - 200, height);
+      canvas.repaint();
+    }
+
+    public void componentMoved(ComponentEvent e) {
+
+    }
+
+    public void componentShown(ComponentEvent e) {
+
+    }
+
+    public void componentHidden(ComponentEvent e) {
     }
   }
 
@@ -132,9 +144,12 @@ public class Grid3 {
     // Canvas class where we override the paint function.
     int originX, originY;
     int height, width;
+    // font
 
     public void paint(Graphics g) {
       g.setColor(Color.BLACK);
+      Font font = new Font("Arial", Font.PLAIN, 20);
+      g.setFont(font);
       height = canvas.getHeight();
       width = canvas.getWidth();
       originX = (canvas.getX() + width) / 2;
@@ -143,12 +158,11 @@ public class Grid3 {
       drawYaxis(g);
       drawOriginCircle(g);
       drawHorizontalLines(g);
-      drawVeritcalLines(g);
+      drawVerticalLines(g);
 
       // iterate through rectangles and draw them
-      for (int i = 0; i < rectangles.size(); i++) {
-        Rectangle rect = (Rectangle) rectangles.get(i);
-        drawRectangle(g, rect);
+      for (Point pt : points) {
+        drawRectangle(g, pt);
       }
     }
 
@@ -167,55 +181,40 @@ public class Grid3 {
       g.fillRect(originX - 2, 0, 4, height);
     }
 
-    public void drawHorizontalLines(Graphics g) {
+    public void drawVerticalLines(Graphics g) {
       g.setColor(gridColor);
       int yCord = 0;
 
       for (int i = originX; i <= width; i += gap, yCord--) {
         g.drawLine(i, 0, i, height);
-        g.drawString(String.valueOf(yCord), originX - 20, i);
-
+        g.drawString(String.valueOf(-1 * yCord), i - 10, originY);
       }
       yCord = 0;
-      for (int i = originX; i >= 0; i -= gap, yCord++) {
+      for (int i = originX; i >= canvas.getX(); i -= gap, yCord++) {
         g.drawLine(i, 0, i, height);
-        g.drawString(String.valueOf(yCord), originX - 20, i);
-
+        // drawstring with font
+        g.drawString(String.valueOf(-1 * yCord), i - 10, originY);
       }
     }
 
-    public void drawVeritcalLines(Graphics g) {
+    public void drawHorizontalLines(Graphics g) {
       g.setColor(gridColor);
       int xCord = 0;
       for (int i = originY; i <= height; i += gap, xCord++) {
         g.drawLine(0, i, width, i);
-        // add coordinate text
-        g.drawString(String.valueOf(xCord), i + 30, originY + 20);
+        g.drawString(String.valueOf(-1 * xCord), originX, i + 5);
       }
       xCord = 0;
-      for (int i = originY; i >= 0; i -= gap, xCord--) {
+      for (int i = originY; i >= canvas.getY(); i -= gap, xCord--) {
         g.drawLine(0, i, width, i);
-        g.drawString(String.valueOf(xCord), i + 30, originY + 20);
-
+        g.drawString(String.valueOf(-1 * xCord), originX, i + 5);
       }
     }
 
-    public void drawLine(Graphics g, int x, int y, int x2, int y2) {
-      g.setColor(Color.BLUE);
-      int appletX = originX + x * gap;
-      int appletY = originY - y * gap;
-      int appletX2 = originX + x2 * gap;
-      int appletY2 = originY - y2 * gap;
-
-      g.drawLine(appletX, appletY, appletX2, appletY2);
-    }
-
-    public void drawRectangle(Graphics g, Rectangle rect) {
-      int appletX = originX + rect.x * gap;
-      int appletY = originY - rect.y * gap;
-      g.setColor(Color.BLUE);
-
-      g.fillRect(appletX, appletY, rect.width * gap, rect.height * gap);
+    public void drawRectangle(Graphics g, Point pt) {
+      int appletX = originX + pt.x * gap;
+      int appletY = originY - pt.y * gap;
+      g.fillRect(appletX - (gap / 2), appletY - (gap / 2), gap, gap);
     }
   }
 }
