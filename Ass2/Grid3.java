@@ -1,12 +1,10 @@
 
-// Question 1, part (ii)
-// DDA Digital differential analyzer to draw a line
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import java.util.*;
 
-public class Grid {
+public class Grid3 {
   // main class
 
   private JFrame mainFrame;
@@ -41,13 +39,13 @@ public class Grid {
     }
   }
 
-  public Grid() {
+  public Grid3() {
     gap = 40;
     prepareGUI();
   }
 
   public static void main(String[] args) {
-    Grid coord = new Grid();
+    Grid3 coord = new Grid3();
   }
 
   private void prepareGUI() {
@@ -66,7 +64,7 @@ public class Grid {
       }
     });
 
-    JButton fgButton = new JButton("Grid");
+    JButton fgButton = new JButton("Grid3");
     fgButton.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
         Color color = JColorChooser.showDialog(mainFrame, "Choose a color", Color.BLACK);
@@ -151,7 +149,7 @@ public class Grid {
     gridPanel.add(canvas);
     gridPanel.add(buttonPanel);
 
-    mainFrame = new JFrame("Assignment 2 - Q1. DDA Arnab Sen (510519006)");
+    mainFrame = new JFrame("Assignment 2 - Q1. Bresenham’s Arnab Sen (510519006)");
     mainFrame.add(gridPanel);
     mainFrame.setSize(1300, 900);
     mainFrame.addComponentListener(new ResizeListener());
@@ -281,22 +279,34 @@ public class Grid {
     }
 
     public void drawLine(Graphics g, Line line) {
+      // midpoint algorithm
       int x1 = line.p1.x;
       int y1 = line.p1.y;
       int x2 = line.p2.x;
       int y2 = line.p2.y;
-      int dx = x2 - x1;
-      int dy = y2 - y1;
-      int steps = Math.abs(dx) > Math.abs(dy) ? Math.abs(dx) : Math.abs(dy);
-      float xInc = dx / (float) steps;
-      float yInc = dy / (float) steps;
-      float x = x1;
-      float y = y1;
-      for (int i = 0; i <= steps; i++) {
-        drawRectangle(g, new Point(Math.round(x), Math.round(y)));
-        x += xInc;
-        y += yInc;
+
+      int dx = (x2 - x1);
+      int dy = (y2 - y1);
+
+      int d = dy - (dx / 2);
+      int x = x1;
+      int y = y1;
+      drawRectangle(g, new Point(x, y));
+
+      while (x < x2) {
+        x++;
+
+        if (d < 0)
+          d = d + dy;
+        else {
+          d += dy - dx;
+          y++;
+        }
+
+        drawRectangle(g, new Point(x, y));
+
       }
+
     }
   }
 }

@@ -1,12 +1,12 @@
 
-// Question 1, part (ii)
-// DDA Digital differential analyzer to draw a line
+// Question 1, part (i)
+// Bresenham's line drawing algorithm
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import java.util.*;
 
-public class Grid {
+public class Grid2 {
   // main class
 
   private JFrame mainFrame;
@@ -41,13 +41,13 @@ public class Grid {
     }
   }
 
-  public Grid() {
+  public Grid2() {
     gap = 40;
     prepareGUI();
   }
 
   public static void main(String[] args) {
-    Grid coord = new Grid();
+    Grid2 coord = new Grid2();
   }
 
   private void prepareGUI() {
@@ -66,7 +66,7 @@ public class Grid {
       }
     });
 
-    JButton fgButton = new JButton("Grid");
+    JButton fgButton = new JButton("Grid2");
     fgButton.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
         Color color = JColorChooser.showDialog(mainFrame, "Choose a color", Color.BLACK);
@@ -151,7 +151,7 @@ public class Grid {
     gridPanel.add(canvas);
     gridPanel.add(buttonPanel);
 
-    mainFrame = new JFrame("Assignment 2 - Q1. DDA Arnab Sen (510519006)");
+    mainFrame = new JFrame("Assignment 2 - Q1. Bresenham’s Arnab Sen (510519006)");
     mainFrame.add(gridPanel);
     mainFrame.setSize(1300, 900);
     mainFrame.addComponentListener(new ResizeListener());
@@ -281,21 +281,30 @@ public class Grid {
     }
 
     public void drawLine(Graphics g, Line line) {
+      // using bresenham algorithm
       int x1 = line.p1.x;
       int y1 = line.p1.y;
       int x2 = line.p2.x;
       int y2 = line.p2.y;
-      int dx = x2 - x1;
-      int dy = y2 - y1;
-      int steps = Math.abs(dx) > Math.abs(dy) ? Math.abs(dx) : Math.abs(dy);
-      float xInc = dx / (float) steps;
-      float yInc = dy / (float) steps;
-      float x = x1;
-      float y = y1;
-      for (int i = 0; i <= steps; i++) {
-        drawRectangle(g, new Point(Math.round(x), Math.round(y)));
-        x += xInc;
-        y += yInc;
+      int dx = Math.abs(x2 - x1);
+      int dy = Math.abs(y2 - y1);
+      int sx = x1 < x2 ? 1 : -1;
+      int sy = y1 < y2 ? 1 : -1;
+      int err = dx - dy;
+      while (true) {
+        drawRectangle(g, new Point(x1, y1));
+        if (x1 == x2 && y1 == y2) {
+          break;
+        }
+        int e2 = err * 2;
+        if (e2 > -dy) {
+          err -= dy;
+          x1 += sx;
+        }
+        if (e2 < dx) {
+          err += dx;
+          y1 += sy;
+        }
       }
     }
   }
