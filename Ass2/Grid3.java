@@ -149,7 +149,7 @@ public class Grid3 {
     gridPanel.add(canvas);
     gridPanel.add(buttonPanel);
 
-    mainFrame = new JFrame("Assignment 2 - Q1. Bresenham’s Arnab Sen (510519006)");
+    mainFrame = new JFrame("Assignment 2 - Q1. Mid Point Arnab Sen (510519006)");
     mainFrame.add(gridPanel);
     mainFrame.setSize(1300, 900);
     mainFrame.addComponentListener(new ResizeListener());
@@ -285,27 +285,39 @@ public class Grid3 {
       int x2 = line.p2.x;
       int y2 = line.p2.y;
 
-      int dx = (x2 - x1);
-      int dy = (y2 - y1);
+      if (x2 < x1 && y2 < y1) {
+        int temp = x1;
+        x1 = x2;
+        x2 = temp;
+        temp = y1;
+        y1 = y2;
+        y2 = temp;
+      }
 
-      int d = dy - (dx / 2);
-      int x = x1;
-      int y = y1;
-      drawRectangle(g, new Point(x, y));
+      int dx = Math.abs(x2 - x1), dy = Math.abs(y2 - y1);
+      int m = dx - dy, p;
+      while (x1 != x2 && y1 != y2) {
+        drawRectangle(g, new Point(x1, y1));
 
-      while (x < x2) {
-        x++;
+        p = 2 * m;
 
-        if (d < 0)
-          d = d + dy;
-        else {
-          d += dy - dx;
-          y++;
+        if (p > -dy) {
+          m = m - dy;
+          if (x1 < x2)
+            x1++;
+          else
+            x1--;
         }
 
-        drawRectangle(g, new Point(x, y));
-
+        if (p < dx) {
+          m = m + dx;
+          if (y1 < y2)
+            y1++;
+          else
+            y1--;
+        }
       }
+      drawRectangle(g, new Point(x2, y2));
 
     }
   }
