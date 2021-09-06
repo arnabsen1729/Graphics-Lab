@@ -301,8 +301,8 @@ public class Twig {
       int y1 = y + (int) (length * Math.sin(Math.toRadians(angle)));
       drawLine(g, new Line(pt, new Point(x1, y1)));
       if (length > 0) {
-        drawTwig(g, new Point(x1, y1), angle - 20, length - 2);
-        drawTwig(g, new Point(x1, y1), angle + 20, length - 2);
+        drawTwig(g, new Point(x1, y1), angle - 20, length - 1);
+        drawTwig(g, new Point(x1, y1), angle + 20, length - 1);
       }
     }
   }

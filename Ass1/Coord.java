@@ -4,10 +4,8 @@ import java.awt.event.*;
 import javax.swing.*;
 
 public class Coord {
-  // main class
-
-  private JFrame mainFrame;
   private ColorsTest canvas;
+  private JFrame mainFrame;
 
   private int originX = 0;
   private int originY = 0;
