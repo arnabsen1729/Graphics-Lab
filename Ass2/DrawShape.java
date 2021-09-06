@@ -4,17 +4,12 @@ import java.awt.event.*;
 import javax.swing.*;
 import java.util.*;
 
-public class Twig {
-  // main class
-
+public class DrawShape {
   private JFrame mainFrame;
   private GridCanvas canvas;
   private JPanel gridPanel;
   private Color gridColor;
   private int gap;
-
-  private ArrayList<Point> points = new ArrayList<Point>();
-  private ArrayList<Line> lines = new ArrayList<Line>();
 
   public class Point {
     public int x, y;
@@ -39,13 +34,13 @@ public class Twig {
     }
   }
 
-  public Twig() {
+  public DrawShape() {
     gap = 40;
     prepareGUI();
   }
 
   public static void main(String[] args) {
-    Twig coord = new Twig();
+    DrawShape coord = new DrawShape();
   }
 
   private void prepareGUI() {
@@ -123,7 +118,8 @@ public class Twig {
       drawHorizontalLines(g);
       drawVerticalLines(g);
 
-      drawTwig(g, new Point(0, -10), 90, 10);
+      Shape shapeOb = new Shape();
+      shapeOb.paint(g);
     }
 
     public void drawOriginCircle(Graphics g) {
@@ -196,15 +192,64 @@ public class Twig {
       }
     }
 
-    public void drawTwig(Graphics g, Point pt, int angle, int length) {
-      int x = pt.x;
-      int y = pt.y;
-      int x1 = x + (int) (length * Math.cos(Math.toRadians(angle)));
-      int y1 = y + (int) (length * Math.sin(Math.toRadians(angle)));
-      drawLine(g, new Line(pt, new Point(x1, y1)));
-      if (length > 0) {
-        drawTwig(g, new Point(x1, y1), angle - 20, length - 1);
-        drawTwig(g, new Point(x1, y1), angle + 20, length - 1);
+    class Shape {
+      int base;
+      int height;
+      int distance;
+      Point start;
+      int separation;
+
+      Shape() {
+        base = 23;
+        height = 12;
+        distance = 4;
+        start = new Point(-7, 8);
+        separation = 11;
+      }
+
+      public void paint(Graphics g) {
+        drawUpRAT(g);
+        drawDownRAT(g);
+      }
+
+      public void drawUpRAT(Graphics g) {
+        // draw a right angles triangle
+
+        Point A = start;
+        Point B = new Point(A.x + base, A.y);
+        Point C = new Point(A.x + base, A.y + height);
+
+        Line AB = new Line(A, B);
+        Line BC = new Line(B, C);
+        Line CA = new Line(C, A);
+
+        drawLine(g, AB);
+        drawLine(g, BC);
+        drawLine(g, CA);
+
+        // draw veritical lines of height 4 at a gap of distance
+        for (int i = 2; i <= base; i += distance) {
+          drawLine(g, new Line(new Point(A.x + i, A.y), new Point(A.x + i, A.y - distance)));
+        }
+      }
+
+      public void drawDownRAT(Graphics g) {
+        // draw a right angles triangle
+        Point A = new Point(start.x, start.y - separation);
+        Point B = new Point(A.x + base, A.y);
+        Point C = new Point(A.x + base, A.y - height);
+
+        Line AB = new Line(A, B);
+        Line BC = new Line(B, C);
+        Line CA = new Line(C, A);
+
+        drawLine(g, AB);
+        drawLine(g, BC);
+        drawLine(g, CA);
+
+        for (int i = 2; i <= base; i += distance) {
+          drawLine(g, new Line(new Point(A.x + i, A.y), new Point(A.x + i, A.y + distance)));
+        }
       }
     }
   }
