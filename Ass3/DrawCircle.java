@@ -1,15 +1,21 @@
 
+// Assignment 3
+// Part 1, Circle Midpoint circle drawing algorithm
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import java.util.*;
 
-public class DrawShape {
+public class DrawCircle {
+  // main class
+
   private JFrame mainFrame;
   private GridCanvas canvas;
   private JPanel gridPanel;
   private Color gridColor;
   private int gap;
+
+  private ArrayList<Circle> circles = new ArrayList<Circle>();
 
   public class Point {
     public int x, y;
@@ -17,6 +23,16 @@ public class DrawShape {
     Point(int x, int y) {
       this.x = x;
       this.y = y;
+    }
+  }
+
+  public class Circle {
+    public Point center;
+    int radius;
+
+    Circle(Point c, int r) {
+      this.center = c;
+      this.radius = r;
     }
   }
 
@@ -34,24 +50,62 @@ public class DrawShape {
     }
   }
 
-  public DrawShape() {
+  public DrawCircle() {
     gap = 40;
     prepareGUI();
   }
 
   public static void main(String[] args) {
-    DrawShape coord = new DrawShape();
+    DrawCircle coord = new DrawCircle();
   }
 
   private void prepareGUI() {
     gridPanel = new JPanel();
+    JPanel buttonPanel = new JPanel(new GridLayout(1, 1));
     canvas = new GridCanvas();
     canvas.setSize(800, 800);
+    // canvas.addMouseListener(new CustomMouseListener());
     canvas.addMouseWheelListener(new CustomMouseWheelListener());
 
-    gridPanel.add(canvas);
+    // button to draw point
+    JButton circleBtn = new JButton("Add Circle");
+    circleBtn.addActionListener(new ActionListener() {
+      public void actionPerformed(ActionEvent e) {
+        // show a dialog to enter point coordinates
+        JPanel coordPanel = new JPanel(new GridLayout(0, 1));
+        JTextField x = new JTextField(2);
+        JTextField y = new JTextField(2);
+        JTextField r = new JTextField(2);
 
-    mainFrame = new JFrame("Assignment 2 - Q3. Draw Shape Arnab Sen (510519006)");
+        coordPanel.add(new JLabel("Center X Coord: "));
+        coordPanel.add(x);
+        coordPanel.add(new JLabel("Center Y Coord "));
+        coordPanel.add(y);
+        coordPanel.add(new JLabel("Radius: "));
+        coordPanel.add(r);
+
+        int result = JOptionPane.showConfirmDialog(mainFrame, coordPanel, "Enter coordinates for point",
+            JOptionPane.OK_CANCEL_OPTION);
+
+        if (result == JOptionPane.OK_OPTION && x.getText().length() > 0 && y.getText().length() > 0
+            && r.getText().length() > 0) {
+          int xCoord = Integer.parseInt(x.getText());
+          int yCoord = Integer.parseInt(y.getText());
+          int radius = Integer.parseInt(r.getText());
+
+          Point pt = new Point(xCoord, yCoord);
+          circles.add(new Circle(pt, radius));
+          canvas.repaint();
+        }
+      }
+    });
+
+    buttonPanel.add(circleBtn);
+
+    gridPanel.add(canvas);
+    gridPanel.add(buttonPanel);
+
+    mainFrame = new JFrame("Assignment 3 - Q1. Circle using Mid Point Arnab Sen (510519006)");
     mainFrame.add(gridPanel);
     mainFrame.setSize(1300, 900);
     mainFrame.addComponentListener(new ResizeListener());
@@ -71,7 +125,7 @@ public class DrawShape {
         gap = gap > 150 ? 150 : gap;
       } else {
         gap = gap - 10;
-        gap = gap < 10 ? 10 : gap;
+        gap = gap < 20 ? 20 : gap;
       }
       canvas.repaint();
     }
@@ -106,7 +160,7 @@ public class DrawShape {
 
     public void paint(Graphics g) {
       g.setColor(Color.BLACK);
-      Font font = new Font("Arial", Font.PLAIN, 10);
+      Font font = new Font("Arial", Font.PLAIN, 20);
       g.setFont(font);
       height = canvas.getHeight();
       width = canvas.getWidth();
@@ -117,9 +171,11 @@ public class DrawShape {
       drawOriginCircle(g);
       drawHorizontalLines(g);
       drawVerticalLines(g);
-      g.setColor(Color.RED);
-      Shape shapeOb = new Shape();
-      shapeOb.paint(g);
+
+      // loop and draw all circles
+      for (Circle c : circles) {
+        drawCircle(g, c);
+      }
     }
 
     public void drawOriginCircle(Graphics g) {
@@ -167,10 +223,52 @@ public class DrawShape {
       }
     }
 
-    public void drawRectangle(Graphics g, Point pt) {
+    public void drawPoint(Graphics g, Point pt) {
+      g.setColor(Color.BLACK);
       int appletX = originX + pt.x * gap;
       int appletY = originY - pt.y * gap;
       g.fillRect(appletX - (gap / 2), appletY - (gap / 2), gap, gap);
+    }
+
+    public void drawCircle(Graphics g, Circle c) {
+      // draw Circle using mid point algorithm
+      int x_centre = c.center.x;
+      int y_centre = c.center.y;
+      int radius = c.radius;
+      int x = radius, y = 0;
+      drawPoint(g, new Point(x + x_centre, y + y_centre));
+
+      if (radius > 0) {
+        drawPoint(g, new Point(-x + x_centre, y + y_centre));
+        drawPoint(g, new Point(y + x_centre, x + y_centre));
+        drawPoint(g, new Point(y + x_centre, -x + y_centre));
+      }
+
+      int P = 1 - radius;
+      while (x > y) {
+        y++;
+        if (P <= 0)
+          P = P + 2 * y + 1;
+        else {
+          x--;
+          P = P + 2 * y - 2 * x + 1;
+        }
+
+        if (x < y)
+          break;
+        drawPoint(g, new Point(x + x_centre, y + y_centre));
+        drawPoint(g, new Point(-x + x_centre, y + y_centre));
+        drawPoint(g, new Point(x + x_centre, -y + y_centre));
+        drawPoint(g, new Point(-x + x_centre, -y + y_centre));
+
+        if (x != y) {
+          drawPoint(g, new Point(y + x_centre, x + y_centre));
+          drawPoint(g, new Point(-y + x_centre, x + y_centre));
+          drawPoint(g, new Point(y + x_centre, -x + y_centre));
+          drawPoint(g, new Point(-y + x_centre, -x + y_centre));
+        }
+      }
+
     }
 
     public void drawLine(Graphics g, Line line) {
@@ -186,70 +284,9 @@ public class DrawShape {
       float x = x1;
       float y = y1;
       for (int i = 0; i <= steps; i++) {
-        drawRectangle(g, new Point(Math.round(x), Math.round(y)));
+        drawPoint(g, new Point(Math.round(x), Math.round(y)));
         x += xInc;
         y += yInc;
-      }
-    }
-
-    class Shape {
-      int base;
-      int height;
-      int distance;
-      Point start;
-      int separation;
-
-      Shape() {
-        base = 23;
-        height = 12;
-        distance = 4;
-        start = new Point(-7, 8);
-        separation = 11;
-      }
-
-      public void paint(Graphics g) {
-        drawUpRAT(g);
-        drawDownRAT(g);
-      }
-
-      public void drawUpRAT(Graphics g) {
-        // draw a right angles triangle
-
-        Point A = start;
-        Point B = new Point(A.x + base, A.y);
-        Point C = new Point(A.x + base, A.y + height);
-
-        Line AB = new Line(A, B);
-        Line BC = new Line(B, C);
-        Line CA = new Line(C, A);
-
-        drawLine(g, AB);
-        drawLine(g, BC);
-        drawLine(g, CA);
-
-        // draw veritical lines of height 4 at a gap of distance
-        for (int i = 2; i <= base; i += distance) {
-          drawLine(g, new Line(new Point(A.x + i, A.y), new Point(A.x + i, A.y - distance)));
-        }
-      }
-
-      public void drawDownRAT(Graphics g) {
-        // draw a right angles triangle
-        Point A = new Point(start.x, start.y - separation);
-        Point B = new Point(A.x + base, A.y);
-        Point C = new Point(A.x + base, A.y - height);
-
-        Line AB = new Line(A, B);
-        Line BC = new Line(B, C);
-        Line CA = new Line(C, A);
-
-        drawLine(g, AB);
-        drawLine(g, BC);
-        drawLine(g, CA);
-
-        for (int i = 2; i <= base; i += distance) {
-          drawLine(g, new Line(new Point(A.x + i, A.y), new Point(A.x + i, A.y + distance)));
-        }
       }
     }
   }

@@ -122,7 +122,7 @@ public class Twig {
       drawOriginCircle(g);
       drawHorizontalLines(g);
       drawVerticalLines(g);
-
+      g.setColor(Color.RED);
       drawTwig(g, new Point(0, -10), 90, 10);
     }
 
@@ -142,7 +142,7 @@ public class Twig {
     }
 
     public void drawVerticalLines(Graphics g) {
-      g.setColor(gridColor);
+      g.setColor(Color.BLACK);
       int yCord = 0;
 
       for (int i = originX; i <= width; i += gap, yCord--) {
@@ -158,7 +158,7 @@ public class Twig {
     }
 
     public void drawHorizontalLines(Graphics g) {
-      g.setColor(gridColor);
+      g.setColor(Color.BLACK);
       int xCord = 0;
       for (int i = originY; i <= height; i += gap, xCord++) {
         g.drawLine(0, i, width, i);
