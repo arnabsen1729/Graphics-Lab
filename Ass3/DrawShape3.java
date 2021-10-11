@@ -1,12 +1,12 @@
 
 // Assignment 3
-// Part 2, Ellipse using Midpoint ellipse drawing algorithm
+// Part 3, Shape 3
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import java.util.*;
 
-public class DrawEllipse {
+public class DrawShape3 {
   // main class
 
   private JFrame mainFrame;
@@ -16,6 +16,8 @@ public class DrawEllipse {
   private int gap;
 
   private ArrayList<Ellipse> ellipses = new ArrayList<Ellipse>();
+  private ArrayList<Line> lines = new ArrayList<Line>();
+  private ArrayList<Circle> circles = new ArrayList<Circle>();
 
   public class Point {
     public int x, y;
@@ -23,6 +25,16 @@ public class DrawEllipse {
     Point(int x, int y) {
       this.x = x;
       this.y = y;
+    }
+  }
+
+  public class Circle {
+    public Point center;
+    int radius;
+
+    Circle(Point c, int r) {
+      this.center = c;
+      this.radius = r;
     }
   }
 
@@ -51,66 +63,24 @@ public class DrawEllipse {
     }
   }
 
-  public DrawEllipse() {
-    gap = 40;
+  public DrawShape3() {
+    gap = 10;
     prepareGUI();
   }
 
   public static void main(String[] args) {
-    DrawEllipse coord = new DrawEllipse();
+    DrawShape3 coord = new DrawShape3();
   }
 
   private void prepareGUI() {
     gridPanel = new JPanel();
-    JPanel buttonPanel = new JPanel(new GridLayout(1, 1));
     canvas = new GridCanvas();
     canvas.setSize(800, 800);
-    // canvas.addMouseListener(new CustomMouseListener());
     canvas.addMouseWheelListener(new CustomMouseWheelListener());
 
-    // button to draw point
-    JButton circleBtn = new JButton("Add Ellipse");
-    circleBtn.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-        // show a dialog to enter point coordinates
-        JPanel coordPanel = new JPanel(new GridLayout(0, 1));
-        JTextField x = new JTextField(2);
-        JTextField y = new JTextField(2);
-        JTextField rx = new JTextField(2);
-        JTextField ry = new JTextField(2);
-
-        coordPanel.add(new JLabel("Center X Coord: "));
-        coordPanel.add(x);
-        coordPanel.add(new JLabel("Center Y Coord "));
-        coordPanel.add(y);
-        coordPanel.add(new JLabel("Radius along X axis: "));
-        coordPanel.add(rx);
-        coordPanel.add(new JLabel("Radius along X axis: "));
-        coordPanel.add(ry);
-
-        int result = JOptionPane.showConfirmDialog(mainFrame, coordPanel, "Enter coordinates for point",
-            JOptionPane.OK_CANCEL_OPTION);
-
-        if (result == JOptionPane.OK_OPTION && x.getText().length() > 0 && y.getText().length() > 0
-            && rx.getText().length() > 0 && ry.getText().length() > 0) {
-          int xCoord = Integer.parseInt(x.getText());
-          int yCoord = Integer.parseInt(y.getText());
-          int radiusX = Integer.parseInt(rx.getText());
-          int radiusY = Integer.parseInt(ry.getText());
-
-          Point pt = new Point(xCoord, yCoord);
-          ellipses.add(new Ellipse(pt, radiusX, radiusY));
-          canvas.repaint();
-        }
-      }
-    });
-
-    buttonPanel.add(circleBtn);
-
     gridPanel.add(canvas);
-    gridPanel.add(buttonPanel);
 
-    mainFrame = new JFrame("Assignment 3 - Q2. Ellipse Arnab Sen (510519006)");
+    mainFrame = new JFrame("Assignment 3 - Q3. Shape 3 Arnab Sen (510519006)");
     mainFrame.add(gridPanel);
     mainFrame.setSize(1300, 900);
     mainFrame.addComponentListener(new ResizeListener());
@@ -130,7 +100,7 @@ public class DrawEllipse {
         gap = gap > 150 ? 150 : gap;
       } else {
         gap = gap - 10;
-        gap = gap < 20 ? 20 : gap;
+        gap = gap < 10 ? 10 : gap;
       }
       canvas.repaint();
     }
@@ -178,8 +148,26 @@ public class DrawEllipse {
       drawVerticalLines(g);
 
       // loop and draw all circles
-      for (Ellipse c : ellipses) {
-        drawEllipse(g, c);
+      circles.add(new Circle(new Point(0, 0), 11));
+      circles.add(new Circle(new Point(0, 0), 8));
+      ArrayList<Point> points = new ArrayList<Point>();
+      points.add(new Point(8, 2));
+      points.add(new Point(7, 4));
+      points.add(new Point(6, 5));
+      points.add(new Point(4, 7));
+      points.add(new Point(2, 8));
+
+      for (Point p : points) {
+        lines.add(new Line(p, new Point(3 * p.x, 3 * p.y)));
+        lines.add(new Line(new Point(-p.x, p.y), new Point(-3 * p.x, 3 * p.y)));
+      }
+
+      for (Circle c : circles) {
+        drawCircle(g, c);
+      }
+
+      for (Line l : lines) {
+        drawLine(g, l);
       }
     }
 
@@ -204,13 +192,13 @@ public class DrawEllipse {
 
       for (int i = originX; i <= width; i += gap, yCord--) {
         g.drawLine(i, 0, i, height);
-        g.drawString(String.valueOf(-1 * yCord), i - 10, originY);
+        // g.drawString(String.valueOf(-1 * yCord), i - 10, originY);
       }
       yCord = 0;
       for (int i = originX; i >= canvas.getX(); i -= gap, yCord++) {
         g.drawLine(i, 0, i, height);
         // drawstring with font
-        g.drawString(String.valueOf(-1 * yCord), i - 10, originY);
+        // g.drawString(String.valueOf(-1 * yCord), i - 10, originY);
       }
     }
 
@@ -219,12 +207,12 @@ public class DrawEllipse {
       int xCord = 0;
       for (int i = originY; i <= height; i += gap, xCord++) {
         g.drawLine(0, i, width, i);
-        g.drawString(String.valueOf(-1 * xCord), originX, i + 5);
+        // g.drawString(String.valueOf(-1 * xCord), originX, i + 5);
       }
       xCord = 0;
       for (int i = originY; i >= canvas.getY(); i -= gap, xCord--) {
         g.drawLine(0, i, width, i);
-        g.drawString(String.valueOf(-1 * xCord), originX, i + 5);
+        // g.drawString(String.valueOf(-1 * xCord), originX, i + 5);
       }
     }
 
@@ -243,7 +231,6 @@ public class DrawEllipse {
       float dx, dy, d1, d2, x, y;
       x = 0;
       y = ry;
-
       d1 = (ry * ry) - (rx * rx * ry) + (0.25f * rx * rx);
       dx = 2 * ry * ry * x;
       dy = 2 * rx * rx * y;
@@ -286,6 +273,48 @@ public class DrawEllipse {
           d2 = d2 + dx - dy + (ry * ry);
         }
       }
+    }
+
+    public void drawCircle(Graphics g, Circle c) {
+      // draw Circle using mid point algorithm
+      int x_centre = c.center.x;
+      int y_centre = c.center.y;
+      int radius = c.radius;
+      int x = radius, y = 0;
+      drawPoint(g, new Point(x + x_centre, y + y_centre));
+
+      if (radius > 0) {
+        drawPoint(g, new Point(-x + x_centre, y + y_centre));
+        drawPoint(g, new Point(y + x_centre, x + y_centre));
+        drawPoint(g, new Point(y + x_centre, -x + y_centre));
+      }
+
+      int P = 1 - radius;
+      while (x > y) {
+        y++;
+        if (P <= 0)
+          P = P + 2 * y + 1;
+        else {
+          x--;
+          P = P + 2 * y - 2 * x + 1;
+        }
+
+        if (x < y)
+          break;
+
+        drawPoint(g, new Point(x + x_centre, y + y_centre));
+        drawPoint(g, new Point(-x + x_centre, y + y_centre));
+        drawPoint(g, new Point(x + x_centre, -y + y_centre));
+        drawPoint(g, new Point(-x + x_centre, -y + y_centre));
+
+        if (x != y) {
+          drawPoint(g, new Point(y + x_centre, x + y_centre));
+          drawPoint(g, new Point(-y + x_centre, x + y_centre));
+          drawPoint(g, new Point(y + x_centre, -x + y_centre));
+          drawPoint(g, new Point(-y + x_centre, -x + y_centre));
+        }
+      }
+
     }
 
     public void drawLine(Graphics g, Line line) {
